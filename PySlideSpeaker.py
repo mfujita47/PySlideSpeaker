@@ -15,6 +15,9 @@ Requirements:
     PyYAML>=6.0          # YAML parsing
 """
 
+__version__ = "1.0.0"
+__author__ = "mfujita47 (Mitsugu Fujita)"
+
 from __future__ import annotations
 
 import argparse
