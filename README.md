@@ -10,6 +10,8 @@ PySlideSpeaker is a CLI tool that automatically generates presentation videos (M
 - ⚙️ **Flexible Configuration**: Supports global settings for voice, speed, and pauses, with per-slide overrides.
 - 🌍 **Cross-Platform**: Works on Windows, macOS, and Linux (Python environment required).
 
+https://github.com/user-attachments/assets/292f6921-1442-4b9b-aaf2-d952496dcd4a
+
 ## 📋 Requirements
 
 - Python 3.10+
