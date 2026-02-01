@@ -2,6 +2,8 @@
 
 PySlideSpeaker is a CLI tool that automatically generates presentation videos (MP4) from PDF slides and a script defined in YAML. It leverages Microsoft Edge TTS for high-quality voice synthesis and MoviePy for video assembly, featuring an incremental build system to minimize processing time during edits.
 
+https://github.com/user-attachments/assets/292f6921-1442-4b9b-aaf2-d952496dcd4a
+
 ## ✨ Features
 
 - 🎬 **Automated Video Generation**: Converts PDF slides and text scripts into a complete video presentation.
@@ -9,8 +11,6 @@ PySlideSpeaker is a CLI tool that automatically generates presentation videos (M
 - ⚡ **Smart Incremental Builds**: Each video clip is hash-managed based on slide content, voice settings, and pauses. When you edit your script, only the modified slides are regenerated—minimizing rework and dramatically speeding up iteration cycles.
 - ⚙️ **Flexible Configuration**: Supports global settings for voice, speed, and pauses, with per-slide overrides.
 - 🌍 **Cross-Platform**: Works on Windows, macOS, and Linux (Python environment required).
-
-https://github.com/user-attachments/assets/292f6921-1442-4b9b-aaf2-d952496dcd4a
 
 ## 📋 Requirements
 
