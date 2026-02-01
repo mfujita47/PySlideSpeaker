@@ -2,15 +2,15 @@
 
 PySlideSpeaker is a CLI tool that automatically generates presentation videos (MP4) from PDF slides and a script defined in YAML. It leverages Microsoft Edge TTS for high-quality voice synthesis and MoviePy for video assembly, featuring an incremental build system to minimize processing time during edits.
 
-## Features
+## ✨ Features
 
-- **Automated Video Generation**: Converts PDF slides and text scripts into a complete video presentation.
-- **High-Quality TTS**: Uses `edge-tts` (Microsoft Edge Text-to-Speech) for natural-sounding voiceovers without API keys.
-- **Smart Incremental Builds**: Each video clip is hash-managed based on slide content, voice settings, and pauses. When you edit your script, only the modified slides are regenerated—minimizing rework and dramatically speeding up iteration cycles.
-- **Flexible Configuration**: Supports global settings for voice, speed, and pauses, with per-slide overrides.
-- **Cross-Platform**: Works on Windows, macOS, and Linux (Python environment required).
+- 🎬 **Automated Video Generation**: Converts PDF slides and text scripts into a complete video presentation.
+- 🎙️ **High-Quality TTS**: Uses `edge-tts` (Microsoft Edge Text-to-Speech) for natural-sounding voiceovers without API keys.
+- ⚡ **Smart Incremental Builds**: Each video clip is hash-managed based on slide content, voice settings, and pauses. When you edit your script, only the modified slides are regenerated—minimizing rework and dramatically speeding up iteration cycles.
+- ⚙️ **Flexible Configuration**: Supports global settings for voice, speed, and pauses, with per-slide overrides.
+- 🌍 **Cross-Platform**: Works on Windows, macOS, and Linux (Python environment required).
 
-## Requirements
+## 📋 Requirements
 
 - Python 3.10+
 - [FFmpeg](https://ffmpeg.org/) (usually handled automatically by `imageio-ffmpeg`)
@@ -21,7 +21,7 @@ See `requirements.txt` for Python dependencies:
 - `moviepy` (Video editing)
 - `PyYAML` (Configuration)
 
-## Installation
+## 🚀 Installation
 
 1. Clone the repository:
    ```bash
@@ -34,9 +34,9 @@ See `requirements.txt` for Python dependencies:
    pip install -r requirements.txt
    ```
 
-## Usage
+## 💻 Usage
 
-### Quick Start
+### ⚡ Quick Start
 
 With a single `.pdf` and `.yaml` in your directory:
 
@@ -50,7 +50,7 @@ Or specify files explicitly:
 python PySlideSpeaker.py --pdf slides.pdf --script script.yaml --output presentation.mp4
 ```
 
-### Workflow Example
+### 🔄 Workflow Example
 
 1. **Create slides** with Marp (or PowerPoint/Keynote):
    ```bash
@@ -71,7 +71,7 @@ python PySlideSpeaker.py --pdf slides.pdf --script script.yaml --output presenta
 - `--cache`: Cache directory (default: current directory)
 - `--clean`: Force clean rebuild
 
-## Configuration
+## ⚙️ Configuration
 
 ### Example `script.yaml`
 
@@ -94,7 +94,7 @@ slides:
     rate: "+10%"             # Override speed for this slide
 ```
 
-### YAML Script Generation
+### 🤖 YAML Script Generation
 
 Use `prompt for yaml generation.md` as an LLM prompt template:
 
@@ -106,10 +106,10 @@ Use `prompt for yaml generation.md` as an LLM prompt template:
 
 - `[pause]`: Inserts a silence of `inline_pause` seconds within the speech.
 
-## Author
+## 👤 Author
 
 - **mfujita47 (Mitsugu Fujita)**
 
-## License
+## 📄 License
 
 [MIT License](LICENSE)
