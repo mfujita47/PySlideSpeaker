@@ -34,7 +34,7 @@ warnings.filterwarnings("ignore", message=".*bytes wanted but 0 bytes read.*", c
 from dataclasses import dataclass, field
 from functools import partial
 from pathlib import Path
-from typing import Protocol, TypeAlias, Any
+from typing import Protocol, TypeAlias
 
 import subprocess
 import imageio_ffmpeg
