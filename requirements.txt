@@ -1,0 +1,4 @@
+PyMuPDF>=1.23.0      # PDF processing (import as fitz)
+edge-tts>=6.1.0      # Microsoft Edge TTS (async)
+moviepy>=1.0.3       # Video editing
+PyYAML>=6.0          # YAML parsing

@@ -1,0 +1,20 @@
+global_settings:
+  voice: "en-US-AriaNeural"
+  rate: "+0%"
+  inline_pause: 1.0
+  slide_pause: 1.5
+  video_fps: 24
+  image_dpi: 200
+
+slides:
+  - page: 1
+    text: "Hello, detailed scripts are written here.[pause] This is the title slide."
+
+  - page: 2
+    text: "Here are the notes for the introduction.[pause] We will cover the basics of the project."
+
+  - page: 3
+    text: "Moving on to the features.[pause] We have Feature A, Feature B, and Feature C."
+
+  - page: 4
+    text: "Finally, the conclusion.[pause] Thank you for listening."
