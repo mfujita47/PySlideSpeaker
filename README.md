@@ -25,7 +25,7 @@ See `requirements.txt` for Python dependencies:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/PySlideSpeaker.git
+   git clone https://github.com/mfujita47/PySlideSpeaker.git
    cd PySlideSpeaker
    ```
 
