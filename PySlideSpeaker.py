@@ -17,13 +17,12 @@ Requirements:
 
 from __future__ import annotations
 
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 __author__ = "mfujita47 (Mitsugu Fujita)"
 
 import argparse
 import asyncio
 import hashlib
-import json
 import sys
 import tempfile
 import warnings  # Added explicitly
@@ -101,14 +100,6 @@ class SlideEntry:
     voice: str | None = None  # Override global voice
     rate: str | None = None  # Override global rate
     note: str | None = None  # Optional note (ignored in processing)
-
-
-@dataclass
-class CacheState:
-    """キャッシュ状態全体"""
-
-    pdf_mtime: float  # PDF file modification time
-    entries: set[str] = field(default_factory=set)  # Set of cached hashes
 
 
 @dataclass
@@ -196,62 +187,34 @@ class CacheManager:
 
     def __init__(self, cache_dir: Path):
         self.cache_dir = cache_dir
-        self.state_file = cache_dir / "state.json"
         self.cache_dir.mkdir(parents=True, exist_ok=True)
-        self._state: CacheState | None = None
-
-    def load_state(self) -> CacheState:
-        """キャッシュ状態を読み込み"""
-        if self._state is not None:
-            return self._state
-
-        if self.state_file.exists():
-            try:
-                data = json.loads(self.state_file.read_text(encoding="utf-8"))
-                entries = set(data.get("entries", []))
-                self._state = CacheState(
-                    pdf_mtime=data.get("pdf_mtime", 0.0),
-                    entries=entries,
-                )
-            except (json.JSONDecodeError, KeyError):
-                self._state = CacheState(pdf_mtime=0.0)
-        else:
-            self._state = CacheState(pdf_mtime=0.0)
-
-        return self._state
-
-    def save_state(self, state: CacheState) -> None:
-        """キャッシュ状態を保存"""
-        data = {
-            "pdf_mtime": state.pdf_mtime,
-            "entries": list(state.entries),
-        }
-        self.state_file.write_text(
-            json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
-        self._state = state
-
-    def invalidate_all(self) -> None:
-        """全キャッシュを無効化"""
-        self._state = CacheState(pdf_mtime=0.0)
-        # クリップファイルも削除
-        for clip_file in self.cache_dir.glob("clip_*.mp4"):
-            clip_file.unlink(missing_ok=True)
 
     def get_clip_path(self, hash_value: HashValue) -> Path:
         """クリップファイルパスを取得（ハッシュベース）"""
         return self.cache_dir / f"clip_{hash_value}.mp4"
 
+    def cleanup_unused_clips(self, used_paths: list[Path]) -> None:
+        """使用されなかったキャッシュファイルを削除"""
+        used_filenames = {p.name for p in used_paths}
+        for clip_file in self.cache_dir.glob("clip_*.mp4"):
+            if clip_file.name not in used_filenames:
+                print(f"Removing unused cache: {clip_file.name}")
+                clip_file.unlink(missing_ok=True)
 
 
 def compute_slide_hash(
-    slide: SlideEntry, global_settings: GlobalSettings
+    slide: SlideEntry, global_settings: GlobalSettings, pdf_mtime: float, pdf_size: int
 ) -> HashValue:
     """スライドエントリのハッシュを計算"""
     voice = slide.voice or global_settings.voice
     rate = slide.rate or global_settings.rate
-    # ハッシュに影響する要素: ページ番号, テキスト, 音声, 速度, ポーズ長, 遷移ポーズ長
-    content = f"{slide.page}|{slide.text}|{voice}|{rate}|{global_settings.inline_pause}|{global_settings.slide_pause}"
+    # ハッシュに影響する要素: ページ番号, テキスト, 音声, 速度, ポーズ長, 遷移ポーズ長, PDFの更新日時, PDFのサイズ, DPI, FPS, Codecs
+    content = (
+        f"{slide.page}|{slide.text}|{voice}|{rate}|"
+        f"{global_settings.inline_pause}|{global_settings.slide_pause}|"
+        f"{pdf_mtime}|{pdf_size}|{global_settings.image_dpi}|{global_settings.video_fps}|"
+        f"{global_settings.video_codec}|{global_settings.audio_codec}"
+    )
     return hashlib.md5(content.encode("utf-8")).hexdigest()
 
 
@@ -506,11 +469,6 @@ class PySlideSpeakerBuilder:
 
         return global_settings, slides
 
-    def _check_pdf_changed(self, state: CacheState) -> bool:
-        """PDFが変更されたかチェック"""
-        current_mtime = self.pdf_path.stat().st_mtime
-        return current_mtime != state.pdf_mtime
-
     async def _process_slide(
         self,
         slide: SlideEntry,
@@ -568,14 +526,10 @@ class PySlideSpeakerBuilder:
             if not slides:
                 return BuildResult(success=False, error_message="No slides defined in script")
 
-            # キャッシュ状態読み込み
-            state = self.cache_manager.load_state()
-
-            # PDF変更チェック
-            if self._check_pdf_changed(state):
-                print("PDF changed, invalidating all cache...")
-                self.cache_manager.invalidate_all()
-                state = CacheState(pdf_mtime=self.pdf_path.stat().st_mtime)
+            # PDF情報取得 (ハッシュに使用)
+            pdf_stat = self.pdf_path.stat()
+            pdf_mtime = pdf_stat.st_mtime
+            pdf_size = pdf_stat.st_size
 
             # 一時ディレクトリ & Executors
             temp_dir_obj = tempfile.TemporaryDirectory()
@@ -594,11 +548,11 @@ class PySlideSpeakerBuilder:
             print(f"Processing {total_slides} slides...")
 
             for i, slide in enumerate(slides):
-                slide_hash = compute_slide_hash(slide, global_settings)
+                slide_hash = compute_slide_hash(slide, global_settings, pdf_mtime, pdf_size)
                 clip_path = self.cache_manager.get_clip_path(slide_hash)
 
-                # キャッシュチェック
-                if slide_hash in state.entries and clip_path.exists():
+                # キャッシュチェック (ファイルが存在すればOK)
+                if clip_path.exists():
                     print(f"[{i+1}/{total_slides}] Cached: Slide {slide.page}")
                     cached_count += 1
                     final_clip_paths.append(clip_path)
@@ -615,9 +569,6 @@ class PySlideSpeakerBuilder:
                         clip_path,
                     )
                     generated_count += 1
-
-                    # キャッシュ更新
-                    state.entries.add(slide_hash)
                     final_clip_paths.append(clip_path)
 
                 except Exception as e:
@@ -626,8 +577,8 @@ class PySlideSpeakerBuilder:
                     # Don't add to final clips if failed
                     continue
 
-            # キャッシュ保存
-            self.cache_manager.save_state(state)
+            # キャッシュクリーンアップ
+            self.cache_manager.cleanup_unused_clips(final_clip_paths)
 
             if not final_clip_paths:
                 return BuildResult(
@@ -676,10 +627,8 @@ class PySlideSpeakerBuilder:
         if not clip_paths:
             return
 
-        # Create concat list file
-        # file 'path/to/clip1.mp4'
-        # file 'path/to/clip2.mp4'
-        concat_file = output_path.with_suffix('.txt')
+        # Create concat list file (use a safer name or temp dir)
+        concat_file = output_path.with_name(f"_concat_{output_path.stem}.txt")
         try:
             with open(concat_file, 'w', encoding='utf-8') as f:
                 for cp in clip_paths:
@@ -820,7 +769,9 @@ def main() -> int:
     builder = PySlideSpeakerBuilder(pdf_path, script_path, output_file, cache_dir)
     if args.clean:
         print("Cleaning cache...")
-        builder.cache_manager.invalidate_all()
+        for f in cache_dir.glob("*"):
+            if f.is_file():
+                f.unlink()
 
     # ビルド実行
     result = asyncio.run(builder.build())

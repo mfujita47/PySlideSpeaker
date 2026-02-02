@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-02-02
+
+### Changed
+- Refactored cache management system to remove the redundant `state.json` file.
+- Improved cache robustness by incorporating PDF metadata (mtime, size), DPI, FPS, and codecs into slide hashes.
+- Implemented automatic cleanup of unused cache files after successful builds.
+
+### Removed
+- Removed `state.json` and associated internal state-management logic.
+- Cleaned up unused imports (`json`) and obsolete methods.
+
 ## [1.0.1] - 2026-02-02
 
 ### Fixed
