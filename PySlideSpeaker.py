@@ -17,7 +17,7 @@ Requirements:
 
 from __future__ import annotations
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 __author__ = "mfujita47 (Mitsugu Fujita)"
 
 import argparse
@@ -584,10 +584,7 @@ class PySlideSpeakerBuilder:
             # 最終結合
             print(f"\nConcatenating clips -> {self.output_path.name}...")
 
-            # 結合は重い処理なのでExecutorでやりたいが、moviepyのconcatenateは複雑なので
-            # シンプルに同期的に呼ぶか、別途ラップする。
-            # ここではメインループをブロックしないようにExecutor推奨だが、
-            # VideoFileClipの扱いに注意。
+
 
             await asyncio.get_running_loop().run_in_executor(
                 video_generator._executor, # Reuse video generator's executor
