@@ -17,7 +17,7 @@ Requirements:
 
 from __future__ import annotations
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 __author__ = "mfujita47 (Mitsugu Fujita)"
 
 import argparse
@@ -433,13 +433,7 @@ class PySlideSpeakerBuilder:
         settings_dict = DEFAULT_SETTINGS.copy()
 
         if "global_settings" in data:
-            # Map old keys to new if present (backward compatibility)
-            gs = data["global_settings"]
-            if "pause_duration" in gs:
-                gs["inline_pause"] = gs.pop("pause_duration")
-            if "transition_pause" in gs:
-                gs["slide_pause"] = gs.pop("transition_pause")
-            settings_dict.update(gs)
+            settings_dict.update(data["global_settings"])
 
         # Build GlobalSettings object
         global_settings = GlobalSettings(
