@@ -111,9 +111,9 @@ Use `prompt for yaml generation.md` as an LLM prompt template:
 
 - `[pause]`: Inserts a silence of `inline_pause` seconds within the speech.
 
-## 👤 Author
+## 🧑‍💻 Author
 
-- **mfujita47 (Mitsugu Fujita)**
+- **mfujita47 (Mitsugu Fujita)** - [GitHub](https://github.com/mfujita47)
 
 ## 📄 License
 

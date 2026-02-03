@@ -17,7 +17,7 @@ Requirements:
 
 from __future__ import annotations
 
-__version__ = "1.1.2"
+__version__ = "1.2.0"
 __author__ = "mfujita47 (Mitsugu Fujita)"
 
 import argparse
@@ -30,10 +30,10 @@ from concurrent.futures import ThreadPoolExecutor
 
 # Suppress harmless MoviePy warnings about frame reading precision
 warnings.filterwarnings("ignore", message=".*bytes wanted but 0 bytes read.*", category=UserWarning)
-from dataclasses import dataclass, field
+from dataclasses import MISSING, dataclass, field, fields
 from functools import partial
 from pathlib import Path
-from typing import Protocol, TypeAlias
+from typing import Any, Protocol, TypeAlias
 
 import subprocess
 import imageio_ffmpeg
@@ -54,15 +54,23 @@ from moviepy import (
 # Default Settings & Constants
 # =============================================================================
 
-DEFAULT_SETTINGS = {
-    "voice": "ja-JP-NanamiNeural",
-    "inline_pause": 1.0,
-    "slide_pause": 0.0,
-    "video_fps": 24,
-    "image_dpi": 200,
-    "video_codec": "libx264",
-    "audio_codec": "aac",
-    "rate": "+0%",
+@dataclass(frozen=True)
+class GlobalSettings:
+    """グローバル設定"""
+
+    voice: str = "ja-JP-NanamiNeural"
+    inline_pause: float = 1.0
+    slide_pause: float = 0.0
+    video_fps: int = 24
+    image_dpi: int = 200
+    video_codec: str = "libx264"
+    audio_codec: str = "aac"
+    rate: str = "+0%"
+
+
+# GlobalSettings から DEFAULT_SETTINGS を自動生成
+DEFAULT_SETTINGS: dict[str, Any] = {
+    f.name: f.default for f in fields(GlobalSettings) if f.default is not MISSING
 }
 
 # =============================================================================
@@ -76,18 +84,6 @@ PageNumber: TypeAlias = int
 # =============================================================================
 
 
-@dataclass(frozen=True)
-class GlobalSettings:
-    """グローバル設定"""
-
-    voice: str = DEFAULT_SETTINGS["voice"]
-    inline_pause: float = DEFAULT_SETTINGS["inline_pause"]
-    slide_pause: float = DEFAULT_SETTINGS["slide_pause"]
-    video_fps: int = DEFAULT_SETTINGS["video_fps"]
-    image_dpi: int = DEFAULT_SETTINGS["image_dpi"]
-    video_codec: str = DEFAULT_SETTINGS["video_codec"]
-    audio_codec: str = DEFAULT_SETTINGS["audio_codec"]
-    rate: str = DEFAULT_SETTINGS["rate"]
 
 
 @dataclass(frozen=True)
@@ -436,16 +432,7 @@ class PySlideSpeakerBuilder:
             settings_dict.update(data["global_settings"])
 
         # Build GlobalSettings object
-        global_settings = GlobalSettings(
-            voice=str(settings_dict["voice"]),
-            inline_pause=float(settings_dict["inline_pause"]),
-            slide_pause=float(settings_dict["slide_pause"]),
-            video_fps=int(settings_dict["video_fps"]),
-            image_dpi=int(settings_dict["image_dpi"]),
-            video_codec=str(settings_dict["video_codec"]),
-            audio_codec=str(settings_dict["audio_codec"]),
-            rate=str(settings_dict["rate"]),
-        )
+        global_settings = GlobalSettings(**settings_dict)
 
         # Slides
         slides: list[SlideEntry] = []
@@ -748,7 +735,7 @@ def main() -> int:
     else:
         cache_dir = Path(pdf_path.stem).resolve()
 
-    print(f"PySlideSpeaker - Automated Slide Video Generator")
+    print(f"PySlideSpeaker v{__version__}")
     print(f"=" * 50)
     print(f"PDF:    {pdf_path}")
     print(f"Script: {script_path}")
