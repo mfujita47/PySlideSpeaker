@@ -112,7 +112,7 @@ slides:
 
 Use `prompt for yaml generation.md` as an LLM prompt template:
 
-1. Copy [prompt for yaml generation.md](prompt%20for%20yaml%20generation.md) into your LLM (ChatGPT, Claude, etc.)
+1. Copy [prompt for yaml generation.md](https://raw.githubusercontent.com/mfujita47/PySlideSpeaker/refs/heads/main/prompt%20for%20yaml%20generation.md) into your LLM (ChatGPT, Claude, etc.)
 2. Provide your slide content (Markdown, OCR text, or notes)
 3. Get a properly formatted YAML with natural narration
 
