@@ -12,7 +12,7 @@ https://github.com/user-attachments/assets/292f6921-1442-4b9b-aaf2-d952496dcd4a
 - ⚙️ **Flexible Configuration**: Supports global settings for voice, speed, and pauses, with per-slide overrides.
 - 🌍 **Cross-Platform**: Works on Windows, macOS, and Linux (Python environment required).
 
-## � Requirements
+## 📦 Requirements
 
 - Python 3.10+
 - [FFmpeg](https://ffmpeg.org/) (usually handled automatically by `imageio-ffmpeg`)
@@ -87,7 +87,7 @@ python PySlideSpeaker.py --pdf slides.pdf --script script.yaml --output presenta
 
 ## 🛠️ Configuration
 
-### Example `script.yaml`
+### 📄 Example `script.yaml`
 
 ```yaml
 global_settings:
@@ -116,7 +116,7 @@ Use `prompt for yaml generation.md` as an LLM prompt template:
 2. Provide your slide content (Markdown, OCR text, or notes)
 3. Get a properly formatted YAML with natural narration
 
-### Script Tags
+### 🏷️ Script Tags
 
 - `[pause]`: Inserts a silence of `inline_pause` seconds within the speech.
 
@@ -124,10 +124,10 @@ Use `prompt for yaml generation.md` as an LLM prompt template:
 
 - **mfujita47 (Mitsugu Fujita)** - [https://github.com/mfujita47](https://github.com/mfujita47)
 
-## 📜 Change Log
-
-See [CHANGELOG.md](CHANGELOG.md) for a list of recent changes.
-
 ## 📄 License
 
 [MIT License](LICENSE)
+
+## 📜 Change Log
+
+See [CHANGELOG.md](CHANGELOG.md) for a list of recent changes.
