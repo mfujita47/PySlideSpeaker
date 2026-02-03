@@ -1,4 +1,4 @@
-# PySlideSpeaker
+# 🎙️ PySlideSpeaker: Automated Slide Video Generator (v1.2.0)
 
 PySlideSpeaker is a **standalone** CLI tool that automatically generates presentation videos (MP4) from PDF slides and a script defined in YAML. It leverages Microsoft Edge TTS for high-quality voice synthesis and MoviePy for video assembly, featuring an incremental build system to minimize processing time during edits.
 
@@ -8,7 +8,7 @@ https://github.com/user-attachments/assets/292f6921-1442-4b9b-aaf2-d952496dcd4a
 
 - 🎬 **Automated Video Generation**: Converts PDF slides and text scripts into a complete video presentation.
 - 🎙️ **High-Quality TTS**: Uses `edge-tts` (Microsoft Edge Text-to-Speech) for natural-sounding voiceovers without API keys.
-- ⚡  **Smart Incremental Builds**: Each video clip is hash-managed based on slide content, voice settings, and pauses. When you edit your script, only the modified slides are regenerated—minimizing rework and dramatically speeding up iteration cycles.
+- ⚡ **Smart Incremental Builds**: Each video clip is hash-managed based on slide content, voice settings, and pauses. When you edit your script, only the modified slides are regenerated—minimizing rework and dramatically speeding up iteration cycles.
 - ⚙️ **Flexible Configuration**: Supports global settings for voice, speed, and pauses, with per-slide overrides.
 - 🌍 **Cross-Platform**: Works on Windows, macOS, and Linux (Python environment required).
 
@@ -41,7 +41,7 @@ See `requirements.txt` for Python dependencies:
 
 ## 💻 Usage
 
-### ⚡ Quick Start
+### 🏁 Quick Start
 
 With a single `.pdf` and `.yaml` in your directory:
 
@@ -68,13 +68,22 @@ python PySlideSpeaker.py --pdf slides.pdf --script script.yaml --output presenta
 
 4. **Iterate**: Edit `sample.yaml` and re-run—only modified slides regenerate
 
-### Command Line Options
+### 🛠️ Command Line Options
 
-- `--pdf`: Input PDF (default: auto-detect `*.pdf`)
-- `--script`: Input YAML (default: auto-detect `*.yaml`)
-- `--output`: Output MP4 (default: `<pdf_name>.mp4`)
-- `--cache`: Cache directory (default: current directory)
-- `--clean`: Force clean rebuild
+- **`--pdf`**
+  - Input PDF file path.
+  - **Default**: Auto-detect single `*.pdf` in current directory.
+- **`--script`**
+  - YAML script file path.
+  - **Default**: Auto-detect single `*.yaml` in current directory.
+- **`--output`**
+  - Output video file path.
+  - **Default**: `<pdf_name>.mp4`
+- **`--cache`**
+  - Directory for storing cache files (MP4 clips).
+  - **Default**: Current directory (creates a folder named after the PDF).
+- **`--clean`**
+  - Force clean rebuild by deleting the cache directory contents before starting.
 
 ## ⚙️ Configuration
 
@@ -113,7 +122,11 @@ Use `prompt for yaml generation.md` as an LLM prompt template:
 
 ## 🧑‍💻 Author
 
-- **mfujita47 (Mitsugu Fujita)** - [GitHub](https://github.com/mfujita47)
+- **mfujita47 (Mitsugu Fujita)** - [https://github.com/mfujita47](https://github.com/mfujita47)
+
+## 📜 Change Log
+
+See [CHANGELOG.md](CHANGELOG.md) for a list of recent changes.
 
 ## 📄 License
 
