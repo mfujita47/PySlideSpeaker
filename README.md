@@ -12,7 +12,7 @@ https://github.com/user-attachments/assets/292f6921-1442-4b9b-aaf2-d952496dcd4a
 - ⚙️ **Flexible Configuration**: Supports global settings for voice, speed, and pauses, with per-slide overrides.
 - 🌍 **Cross-Platform**: Works on Windows, macOS, and Linux (Python environment required).
 
-## 📋 Requirements
+## � Requirements
 
 - Python 3.10+
 - [FFmpeg](https://ffmpeg.org/) (usually handled automatically by `imageio-ffmpeg`)
@@ -68,7 +68,7 @@ python PySlideSpeaker.py --pdf slides.pdf --script script.yaml --output presenta
 
 4. **Iterate**: Edit `sample.yaml` and re-run—only modified slides regenerate
 
-### 🛠️ Command Line Options
+### ⚙️ Command Line Options
 
 - **`--pdf`**
   - Input PDF file path.
@@ -85,7 +85,7 @@ python PySlideSpeaker.py --pdf slides.pdf --script script.yaml --output presenta
 - **`--clean`**
   - Force clean rebuild by deleting the cache directory contents before starting.
 
-## ⚙️ Configuration
+## 🛠️ Configuration
 
 ### Example `script.yaml`
 
