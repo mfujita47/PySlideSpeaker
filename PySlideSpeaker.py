@@ -17,7 +17,7 @@ Requirements:
 
 from __future__ import annotations
 
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 __author__ = "mfujita47 (Mitsugu Fujita)"
 
 import argparse
@@ -48,6 +48,9 @@ from moviepy import (
     CompositeAudioClip,
     ImageClip,
 )
+from moviepy.audio.fx import MultiplyVolume
+
+
 
 
 # =============================================================================
@@ -374,7 +377,13 @@ class VideoGenerator:
 
             # 画像クリップ作成
             image_clip = ImageClip(str(image_path)).with_duration(duration)
+
+            # 音声の正規化 (Audio Normalization)
+            max_vol = audio_clip.max_volume()
+            if max_vol > 0:
+                audio_clip = audio_clip.with_effects([MultiplyVolume(1.0 / max_vol)])
             image_clip = image_clip.with_audio(audio_clip)
+
 
             # 動画書き出し
             image_clip.write_videofile(
@@ -396,6 +405,7 @@ class VideoGenerator:
                 if image_clip: image_clip.close()
             except Exception:
                 pass
+
 
     def shutdown(self):
         self._executor.shutdown(wait=True)
@@ -528,6 +538,18 @@ class PySlideSpeakerBuilder:
             total_slides = len(slides)
             print(f"Processing {total_slides} slides...")
 
+            # セマフォで同時実行数を制限 (CPU/メモリ負荷を考慮して4程度推奨)
+            semaphore = asyncio.Semaphore(4)
+
+            async def process_with_limit(s, g_settings, ap, vg, cp):
+                async with semaphore:
+                    print(f"Generating: Slide {s.page}")
+                    await self._process_slide(s, g_settings, ap, vg, cp)
+                    return cp
+
+            tasks = []
+            final_clip_paths_map: dict[int, Path] = {}
+
             for i, slide in enumerate(slides):
                 slide_hash = compute_slide_hash(slide, global_settings, pdf_mtime, pdf_size)
                 clip_path = self.cache_manager.get_clip_path(slide_hash)
@@ -536,27 +558,30 @@ class PySlideSpeakerBuilder:
                 if clip_path.exists():
                     print(f"[{i+1}/{total_slides}] Cached: Slide {slide.page}")
                     cached_count += 1
-                    final_clip_paths.append(clip_path)
-                    continue
+                    final_clip_paths_map[i] = clip_path
+                else:
+                    # 新規生成タスクを追加
+                    task = process_with_limit(slide, global_settings, audio_processor, video_generator, clip_path)
+                    tasks.append((i, task))
 
-                # 新規生成
-                print(f"[{i+1}/{total_slides}] Generating: Slide {slide.page}")
-                try:
-                    await self._process_slide(
-                        slide,
-                        global_settings,
-                        audio_processor,
-                        video_generator,
-                        clip_path,
-                    )
-                    generated_count += 1
-                    final_clip_paths.append(clip_path)
+            # 実行と結果の回収
+            if tasks:
+                indices = [t[0] for t in tasks]
+                coroutines = [t[1] for t in tasks]
+                results = await asyncio.gather(*coroutines, return_exceptions=True)
 
-                except Exception as e:
-                    print(f"[{i+1}/{total_slides}] FAILED: Slide {slide.page} - {e}")
-                    failed_slides.append(slide.index)
-                    # Don't add to final clips if failed
-                    continue
+                for idx, result in zip(indices, results):
+                    if isinstance(result, Exception):
+                        slide_page = slides[idx].page
+                        print(f"FAILED: Slide {slide_page} - {result}")
+                        failed_slides.append(slides[idx].index)
+                    else:
+                        generated_count += 1
+                        final_clip_paths_map[idx] = result
+
+            # 順序を維持してパスリストを作成
+            final_clip_paths = [final_clip_paths_map[i] for i in range(total_slides) if i in final_clip_paths_map]
+
 
             # キャッシュクリーンアップ
             self.cache_manager.cleanup_unused_clips(final_clip_paths)
